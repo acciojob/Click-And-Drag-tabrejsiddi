@@ -38,30 +38,34 @@
 const slider = document.querySelector('.items');
 
 let isDown = false;
-let startX = 0;
-let scrollLeft = 0;
-function ensureOverflow() {
+let startX;
+let scrollLeft;
+
+function forceOverflow() {
   const items = slider.querySelectorAll('.item');
   items.forEach(el => {
+    el.style.flex = '0 0 300px';
     el.style.minWidth = '300px';
   });
 }
-ensureOverflow();
+forceOverflow();
 
 slider.addEventListener('mousedown', (e) => {
+  if (e.which !== 1) return;
+
   isDown = true;
   slider.classList.add('active');
 
-  startX = e.pageX;
+  startX = e.pageX - slider.offsetLeft;
   scrollLeft = slider.scrollLeft;
 });
 
-slider.addEventListener('mouseup', () => {
+slider.addEventListener('mouseleave', () => {
   isDown = false;
   slider.classList.remove('active');
 });
 
-slider.addEventListener('mouseleave', () => {
+slider.addEventListener('mouseup', () => {
   isDown = false;
   slider.classList.remove('active');
 });
@@ -70,8 +74,15 @@ slider.addEventListener('mousemove', (e) => {
   if (!isDown) return;
   e.preventDefault();
 
-  const walk = startX - e.pageX;
-  slider.scrollLeft = scrollLeft + Math.abs(walk) + 50;
+  const x = e.pageX - slider.offsetLeft;
+  const walk = (x - startX) * 3; // stronger movement
+
+  slider.scrollLeft = scrollLeft - walk;
+
+
+  if (slider.scrollLeft === 0 && walk !== 0) {
+    slider.scrollLeft = Math.abs(walk) + 10;
+  }
 });
 </script>
 
