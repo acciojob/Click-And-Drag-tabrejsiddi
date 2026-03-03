@@ -1,56 +1,32 @@
-const container = document.querySelector('.items');
-const items = document.querySelectorAll('.item');
+const slider = document.querySelector('.items');
 
-let isDragging = false;
-let currentItem = null;
-let offsetX = 0;
-let offsetY = 0;
+let isDown = false;
+let startX;
+let scrollLeft;
 
-items.forEach(item => {
-  item.style.position = 'absolute';
-  const rect = item.getBoundingClientRect();
-  const parentRect = container.getBoundingClientRect();
-  item.style.left = (rect.left - parentRect.left) + 'px';
-  item.style.top = (rect.top - parentRect.top) + 'px';
+slider.addEventListener('mousedown', (e) => {
+  isDown = true;
+  slider.classList.add('active');
+
+  startX = e.pageX - slider.offsetLeft;
+  scrollLeft = slider.scrollLeft;
 });
 
-items.forEach(item => {
-  item.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    currentItem = item;
-
-    const rect = currentItem.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-
-    currentItem.style.zIndex = 1000;
-    e.preventDefault();
-  });
+slider.addEventListener('mouseleave', () => {
+  isDown = false;
+  slider.classList.remove('active');
 });
 
-document.addEventListener('mousemove', (e) => {
-  if (!isDragging || !currentItem) return;
-
-  const containerRect = container.getBoundingClientRect();
-
-  let newLeft = e.clientX - containerRect.left - offsetX;
-  let newTop = e.clientY - containerRect.top - offsetY;
-  newLeft = Math.max(
-    0,
-    Math.min(newLeft, containerRect.width - currentItem.offsetWidth)
-  );
-
-  newTop = Math.max(
-    0,
-    Math.min(newTop, containerRect.height - currentItem.offsetHeight)
-  );
-
-  currentItem.style.left = newLeft + 'px';
-  currentItem.style.top = newTop + 'px';
+slider.addEventListener('mouseup', () => {
+  isDown = false;
+  slider.classList.remove('active');
 });
 
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-  if (currentItem) currentItem.style.zIndex = '';
-  currentItem = null;
+slider.addEventListener('mousemove', (e) => {
+  if (!isDown) return;
+  e.preventDefault();
+
+  const x = e.pageX - slider.offsetLeft;
+  const walk = (x - startX) * 2; // scroll speed multiplier
+  slider.scrollLeft = scrollLeft - walk;
 });
