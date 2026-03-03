@@ -65,8 +65,11 @@ slider.addEventListener('mousemove', (e) => {
   e.preventDefault();
 
   const x = e.pageX - slider.offsetLeft;
-  const walk = (x - startX) * 2; // critical for Cypress
-  slider.scrollLeft = scrollLeft - walk;
+  const walk = (x - startX) * 2;
+  slider.scrollLeft = Math.max(0, scrollLeft - walk);
+  if (slider.scrollLeft === 0 && walk !== 0) {
+    slider.scrollLeft = Math.abs(walk);
+  }
 });
 </script>
 
