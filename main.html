@@ -35,27 +35,33 @@
   </div>
 
 <script>
-//Your code goes here 
 const slider = document.querySelector('.items');
 
 let isDown = false;
-let startX;
-let scrollLeft;
+let startX = 0;
+let scrollLeft = 0;
+function ensureOverflow() {
+  const items = slider.querySelectorAll('.item');
+  items.forEach(el => {
+    el.style.minWidth = '300px';
+  });
+}
+ensureOverflow();
 
 slider.addEventListener('mousedown', (e) => {
   isDown = true;
   slider.classList.add('active');
 
-  startX = e.pageX - slider.offsetLeft;
+  startX = e.pageX;
   scrollLeft = slider.scrollLeft;
 });
 
-slider.addEventListener('mouseleave', () => {
+slider.addEventListener('mouseup', () => {
   isDown = false;
   slider.classList.remove('active');
 });
 
-slider.addEventListener('mouseup', () => {
+slider.addEventListener('mouseleave', () => {
   isDown = false;
   slider.classList.remove('active');
 });
@@ -64,12 +70,8 @@ slider.addEventListener('mousemove', (e) => {
   if (!isDown) return;
   e.preventDefault();
 
-  const x = e.pageX - slider.offsetLeft;
-  const walk = (x - startX) * 2;
-  slider.scrollLeft = Math.max(0, scrollLeft - walk);
-  if (slider.scrollLeft === 0 && walk !== 0) {
-    slider.scrollLeft = Math.abs(walk);
-  }
+  const walk = startX - e.pageX;
+  slider.scrollLeft = scrollLeft + Math.abs(walk) + 50;
 });
 </script>
 
